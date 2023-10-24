@@ -16,13 +16,17 @@ class GiftsService {
 
   async createGift(gift) {
     let res = await api.post("api/gifts", gift)
-    await this.getGifts()
+    AppState.gifts.unshift(new Gift(res.data))
+    //we make it a Gift before putting it in the Array because the Prop is expecting a gift
+    //push puts it at the end, unshift puts it at the beginning of the array
   }
 
   async openGift(newGift) {
     logger.log("This is the gift you selected", newGift)
-    let change = { opened: true }
-    let res = await api.put(`api/gifts/${newGift.id}`, change)
+    newGift.opened = true
+    // let change = { opened: true }
+    // let res = await api.put(`api/gifts/${newGift.id}`, change)
+    let res = await api.put(`api/gifts/${newGift.id}`, newGift)
     let gifts = AppState.gifts
     let unopenedIndex = gifts.findIndex(gift => gift.id == newGift.id)
     gifts.splice(unopenedIndex, 1, new Gift(res.data))
